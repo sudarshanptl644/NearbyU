@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../CSS/student.css";
 import "../CSS/darkMode.css";
+// We don't import css here because it's imported in the parent pages usually,
+// but for safety in this environment we can leave it out or include if needed.
+// The error was about Marketplace importing Navbar.
 
 const Navbar = ({ userData }) => {
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Check LocalStorage on load
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
@@ -44,8 +46,6 @@ const Navbar = ({ userData }) => {
 
       {/* CENTER: Navigation Links */}
       <div className="nav-links">
-        {/* REMOVED: Vendor Portal Button (as requested) */}
-
         <span
           onClick={() =>
             navigate("/student-home", { state: { studentData: userData } })
@@ -53,7 +53,16 @@ const Navbar = ({ userData }) => {
         >
           Home
         </span>
-        <span>My Orders</span>
+
+        {/* Marketplace Link */}
+        <span
+          onClick={() =>
+            navigate("/marketplace", { state: { studentData: userData } })
+          }
+        >
+          Marketplace
+        </span>
+
         <span>Favorites</span>
 
         <span

@@ -59,6 +59,25 @@
   gap: 15px;
 }
 
+/* Vendor Portal Button (if vendor is viewing) */
+.vendor-portal-btn {
+  background: #f39c12;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-right: 10px;
+  box-shadow: 0 2px 5px rgba(243, 156, 18, 0.3);
+  transition: all 0.2s;
+}
+
+.vendor-portal-btn:hover {
+  background: #e67e22;
+  transform: translateY(-1px);
+}
+
 .nav-logout {
   background: white;
   border: 2px solid #fee2e2;
@@ -292,6 +311,15 @@
   margin-bottom: 10px;
 }
 
+/* Helper for Form Labels (used in Sell Item) */
+.input-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 5px;
+}
+
 /* Category Sections */
 .category-section {
   margin-bottom: 40px;
@@ -332,6 +360,7 @@
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
+/* Category Page Header */
 .category-header-large {
   background: linear-gradient(135deg, #2563eb, #4f46e5);
   padding: 40px;
@@ -450,6 +479,26 @@
   font-size: 1.05rem;
 }
 
+/* Status Pills (Shared) */
+.status-pill {
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.status-open {
+  color: #15803d;
+  background: #dcfce7;
+}
+.status-closed {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+/* Menu Grid */
 .menu-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -480,6 +529,9 @@
   font-weight: 700;
 }
 
+/* =========================== */
+/* REVIEWS SECTION            */
+/* =========================== */
 .review-filter-btn {
   padding: 6px 16px;
   border-radius: 20px;
@@ -571,6 +623,7 @@
   font-weight: 500;
 }
 
+/* Reviews Modal */
 .reviews-modal-overlay {
   position: fixed;
   top: 0;
@@ -789,6 +842,10 @@ body.dark-mode .back-btn:hover {
   background-color: #334155;
 }
 
+body.dark-mode .input-label {
+  color: #cbd5e1;
+}
+
 @media (max-width: 768px) {
   .details-content {
     grid-template-columns: 1fr;
@@ -802,4 +859,356 @@ body.dark-mode .back-btn:hover {
   .active-link {
     display: inline !important;
   }
+}
+
+/* ... KEEP ALL PREVIOUS STYLES ... */
+
+/* =========================== */
+/* MARKETPLACE PAGE STYLES    */
+/* =========================== */
+
+.marketplace-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.marketplace-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.marketplace-header p {
+  color: #64748b;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+/* Toggle Pill Container */
+.toggle-pill-container {
+  display: flex;
+  background: white;
+  padding: 5px;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.toggle-pill-btn {
+  padding: 10px 24px;
+  border-radius: 40px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.toggle-pill-btn.active {
+  background: #2563eb; /* Electric Blue */
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Floating Sell Button */
+.floating-sell-btn {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background: linear-gradient(135deg, #f59e0b, #d97706); /* Amber Gradient */
+  color: white;
+  padding: 15px 25px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.2s;
+  z-index: 90;
+  border: 2px solid white;
+}
+
+.floating-sell-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+}
+
+/* Marketplace Grid Cards */
+.marketplace-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.marketplace-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.marketplace-image-box {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  background: #f1f5f9;
+}
+
+.marketplace-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.marketplace-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.badge-vendor {
+  background: rgba(255, 255, 255, 0.9);
+  color: #1e293b;
+}
+.badge-student {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.status-pill-small {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.status-pill-small.open {
+  background: #dcfce7;
+  color: #15803d;
+}
+.status-pill-small.closed {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.marketplace-info {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.info-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.info-top h3 {
+  font-size: 1.1rem;
+  color: #1e293b;
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-clamp: none;
+}
+
+.price-tag {
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.info-bottom {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.seller-name {
+  color: #64748b;
+  font-weight: 500;
+}
+.link-text {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Modal Specifics */
+.item-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal-hero-img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #eee;
+}
+
+.modal-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-info-row h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  color: #1e293b;
+}
+.modal-price {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #b45309;
+}
+
+.modal-category-pill {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  align-self: flex-start;
+}
+
+.modal-description-box {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.modal-description-box h4 {
+  margin: 0 0 5px 0;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+.modal-description-box p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.modal-contact-box {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-contact-box h4 {
+  margin: 0 0 2px 0;
+  color: #3b82f6;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+.modal-contact-box p {
+  margin: 0;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* Dark Mode for Marketplace */
+body.dark-mode .marketplace-header h1 {
+  color: white;
+}
+body.dark-mode .toggle-pill-container {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-mode .toggle-pill-btn {
+  color: #94a3b8;
+}
+body.dark-mode .toggle-pill-btn.active {
+  color: white;
+}
+
+body.dark-mode .marketplace-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-mode .marketplace-image-box {
+  background: #0f172a;
+}
+body.dark-mode .info-top h3 {
+  color: white;
+}
+body.dark-mode .price-tag {
+  background: #172554;
+  color: #60a5fa;
+}
+body.dark-mode .badge-vendor {
+  background: rgba(30, 41, 59, 0.9);
+  color: white;
+}
+body.dark-mode .info-bottom {
+  border-top-color: #334155;
+}
+
+body.dark-mode .modal-info-row h1 {
+  color: white;
+}
+body.dark-mode .modal-description-box {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-mode .modal-description-box p {
+  color: #cbd5e1;
+}
+body.dark-mode .modal-contact-box {
+  background: #172554;
+  border-color: #1e3a8a;
+}
+body.dark-mode .modal-contact-box p {
+  color: white;
 }
