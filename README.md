@@ -1,18 +1,33 @@
-# React + Vite
+# NearbyU 📍
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> A hyperlocal web application designed to solve day-to-day problems for university students and the nearby vicinity.
 
-Currently, two official plugins are available:
+## 📖 About the Project
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+NearbyU is a web platform aimed at connecting students within the university campus and surrounding areas. It helps users discover local resources, share information, and solve community-specific problems efficiently.
 
-## React Compiler
+**Current Status:** 🚧 In Development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Key Features
 
-## Expanding the ESLint configuration
+- **User Authentication:** Secure login and registration system for students.
+- **Local Discovery:** (Add description, e.g., Find nearby shops, print stores, or events).
+- **Community Board:** (Add description, e.g., Students can post updates or queries).
+- **[Feature 3]:** [Description]
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Tech Stack
 
-# NearbyU
+- **Frontend:** React.js, HTML5, CSS3
+- **Backend:** [e.g., Node.js, Firebase, or Python] (Update this)
+- **Database:** [e.g., MongoDB, SQL] (Update this)
+- **Version Control:** Git & GitHub
+
+## 🚀 Getting Started
+
+To run this project locally on your machine, follow these steps:
+
+**1. Clone the repository**
+
+```bash
+git clone [https://github.com/sudarshanptl1644/NearbyU.git](https://github.com/sudarshanptl1644/NearbyU.git)
+```
