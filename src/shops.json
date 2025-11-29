@@ -1,0 +1,52 @@
+[
+  {
+    "shopId": "campus_bites_cafe",
+    "shopName": "Campus Bites Cafe",
+    "category": "Food & Beverage",
+    "description": "Best burgers and coffee for late night study sessions.",
+    "ownerName": "Rahul Sharma",
+    "vendorUsername": "rahul_cafe_admin",
+    "createdAt": "2025-11-24T06:10:00.000Z",
+    "shopImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR05icpMqeYayBwEAG-OHwO4A1PZWafHt623Q&s"
+  },
+  {
+    "shopId": "quick_wash_laundry",
+    "shopName": "Quick Wash Laundry",
+    "category": "Services",
+    "description": "Express washing, drying, and ironing services within 24 hours.",
+    "ownerName": "Priya Patel",
+    "vendorUsername": "priya_laundry",
+    "createdAt": "2025-11-23T14:30:00.000Z",
+    "shopImage": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/..."
+  },
+  {
+    "shopId": "tech_fix_hub",
+    "shopName": "Tech Fix Hub",
+    "category": "Electronics Repair",
+    "description": "Expert repair for laptops, mobiles, and accessories.",
+    "ownerName": "Vikram Singh",
+    "vendorUsername": "vikram_tech",
+    "createdAt": "2025-11-22T09:15:00.000Z",
+    "shopImage": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/..."
+  },
+  {
+    "shopId": "metro_stationery",
+    "shopName": "Metro Stationery & Gifts",
+    "category": "Stationery",
+    "description": "All project supplies, prints, and art materials available here.",
+    "ownerName": "Anita Desai",
+    "vendorUsername": "anita_metro",
+    "createdAt": "2025-11-20T11:45:00.000Z",
+    "shopImage": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/..."
+  },
+  {
+    "shopId": "fresh_mart_grocery",
+    "shopName": "Fresh Mart",
+    "category": "Groceries",
+    "description": "Daily essentials, snacks, and beverages.",
+    "ownerName": "Suresh Kumar",
+    "vendorUsername": "suresh_freshmart",
+    "createdAt": "2025-11-19T08:20:00.000Z",
+    "shopImage": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/..."
+  }
+]

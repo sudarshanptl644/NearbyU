@@ -1,0 +1,32 @@
+{
+  "stu1": {
+    "email": "alex@university.edu",
+    "name": "Alex Johnson",
+    "studentId": "U1001"
+  },
+  "stu2": {
+    "email": "sarah@university.edu",
+    "name": "Sarah Connor",
+    "studentId": "U1002"
+  },
+  "stu3": {
+    "email": "harshu@university.edu",
+    "name": "Harshu Johnson",
+    "studentId": "U1003"
+  },
+  "stu4": {
+    "email": "kaushik@university.edu",
+    "name": "kaushik Connor",
+    "studentId": "U1004"
+  },
+  "stu5": {
+    "email": "riddhi@university.edu",
+    "name": "riddhi Johnson",
+    "studentId": "U1005"
+  },
+  "stu6": {
+    "email": "siddhi@university.edu",
+    "name": "siddhi Connor",
+    "studentId": "U1006"
+  }
+}

@@ -1,0 +1,363 @@
+/* =========================== */
+/* GLOBAL RESET & BOX SIZING  */
+/* =========================== */
+* {
+  box-sizing: border-box;
+}
+
+/* =========================== */
+/* LOGIN PAGE CONTAINER       */
+/* =========================== */
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)),
+    url("/login-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  overflow: hidden; /* Prevent body scroll if content fits */
+}
+
+/* =========================== */
+/* LOGIN CARD                 */
+/* =========================== */
+.login-card {
+  width: 420px;
+  padding: 30px; /* Reduced padding */
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  color: #2c3e50;
+  transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  max-height: 95vh; /* Ensure it fits in viewport */
+}
+
+/* Wide Card for Vendor View (Split Layout) */
+.login-card.wide-card {
+  width: 850px; /* Slightly narrower to fit better */
+  max-width: 95vw;
+}
+
+/* =========================== */
+/* HEADER & LOGO              */
+/* =========================== */
+.login-logo-container {
+  margin-bottom: 15px; /* Reduced */
+  display: flex;
+  justify-content: center;
+}
+
+.login-logo-img {
+  height: 50px; /* Smaller logo */
+  width: auto;
+  object-fit: contain;
+}
+
+.sub-header {
+  color: #64748b;
+  margin-bottom: 20px; /* Reduced */
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* =========================== */
+/* TOGGLE TABS                */
+/* =========================== */
+.toggle-group {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 25px; /* Reduced */
+  width: 100%;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px; /* Compact tabs */
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.active-tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: white;
+  color: #2563eb;
+  font-weight: 700;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* =========================== */
+/* VENDOR SPLIT LAYOUT        */
+/* =========================== */
+.vendor-split-layout {
+  display: flex;
+  gap: 30px; /* Reduced gap */
+  text-align: left;
+  animation: slideIn 0.4s ease-out;
+  align-items: stretch; /* Ensure equal height */
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.vendor-login-side {
+  flex: 1.2;
+  border-right: 1px solid #e2e8f0;
+  padding-right: 30px; /* Reduced padding */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.vendor-login-side h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+  color: #1e293b;
+  font-weight: 800;
+}
+
+.vendor-register-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Subscription Card - Super Compact */
+.direct-plan-card {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-radius: 16px;
+  padding: 20px; /* Tighter padding */
+  text-align: center;
+  width: 100%;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  border: 1px solid #334155;
+}
+
+.plan-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fbbf24;
+  color: #1e293b;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.4);
+}
+
+.direct-plan-card h3 {
+  margin: 5px 0;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.direct-price {
+  margin: 8px 0;
+  color: #fbbf24;
+}
+
+.cur {
+  font-size: 1rem;
+  vertical-align: top;
+}
+.amt {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.per {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.direct-features {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  text-align: left;
+  display: inline-block;
+}
+
+.direct-features li {
+  margin-bottom: 4px; /* Tighter list items */
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+.subscribe-btn {
+  background: #fbbf24;
+  color: #1e293b;
+  border: none;
+  width: 100%;
+  font-weight: 800;
+  padding: 10px; /* Smaller button */
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.subscribe-btn:hover {
+  background: #f59e0b;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+}
+
+/* =========================== */
+/* INPUT FIELDS               */
+/* =========================== */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reduced gap between inputs */
+  width: 100%;
+}
+
+.input-group {
+  text-align: left;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 4px; /* Closer label */
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px 12px; /* Compact input padding */
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #334155;
+  background-color: #f8fafc;
+  transition: all 0.2s;
+  margin: 0;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.login-input.verified-success {
+  border-color: #10b981;
+  background-color: #ecfdf5;
+  padding-right: 35px;
+}
+
+.verified-tick {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #10b981;
+  font-size: 1.1rem;
+}
+
+/* =========================== */
+/* BUTTONS                    */
+/* =========================== */
+.btn-primary {
+  width: 100%;
+  padding: 12px; /* Compact button */
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+  margin: 0;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.btn-primary.success-btn {
+  background-color: #10b981;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+
+.error-box {
+  background: #fef2f2;
+  color: #ef4444;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  border: 1px solid #fee2e2;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 850px) {
+  .login-card.wide-card {
+    width: 420px;
+    padding: 25px;
+  }
+
+  .vendor-split-layout {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .vendor-login-side {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding-right: 0;
+    padding-bottom: 25px;
+  }
+}

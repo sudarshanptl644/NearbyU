@@ -1,0 +1,67 @@
+{
+  "ven1": {
+    "username": "pizza_hut_campus",
+    "password": "pizza123",
+    "storeName": "Campus Pizza Hut"
+  },
+  "ven2": {
+    "username": "bookstore_admin",
+    "password": "books123",
+    "storeName": "University Bookstore"
+  },
+  "ven3": {
+    "username": "Xerox Shop",
+    "password": "xerox123",
+    "storeName": "Ishwar Xerox"
+  },
+  "ven4": {
+    "username": "Coffee Shop",
+    "password": "Coffee123",
+    "storeName": "Coffee Spot"
+  },
+  "ven5": {
+    "username": "Dipak Laundary",
+    "password": "laundary123",
+    "storeName": "University Laundary"
+  },
+  "ven6": {
+    "username": "Stationary_admin",
+    "password": "sationary123",
+    "storeName": "Laxmi Store"
+  },
+  "ven7": {
+    "username": "mess_admin",
+    "password": "mess123",
+    "storeName": "Neha Mess"
+  },
+  "ven8": {
+    "username": "bakery_admin",
+    "password": "bakery123",
+    "storeName": "Bhumika Bakery"
+  },
+  "ven9": {
+    "username": "specs_admin",
+    "password": "specs123",
+    "storeName": "Parth Eyeware"
+  },
+  "ven10": {
+    "username": "classes_admin",
+    "password": "classes123",
+    "storeName": "Moksh Programming Classes"
+  },
+  "ven11": {
+    "username": "canteen_admin",
+    "password": "canteen123",
+    "storeName": "University Canteen"
+  },
+  "ven12": {
+    "username": "cinema_admin",
+    "password": "cinema123",
+    "storeName": "Patel Cinema"
+  },
+  "ven13": {
+    "username": "icecream-admin",
+    "password": "icecream123",
+    "storeName": "Patel ice cream"
+  }
+}
