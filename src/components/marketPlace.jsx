@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { db } from "../firebase";
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, remove } from "firebase/database";
 import Navbar from "./navbar";
 import "../CSS/student.css";
 
@@ -9,8 +9,10 @@ const Marketplace = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const studentData = location.state?.studentData;
+  // Retrieve tab state if returning from details page
+  const initialTab = location.state?.defaultTab || "vendor";
 
-  const [activeTab, setActiveTab] = useState("vendor"); // 'vendor' or 'student'
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [vendorItems, setVendorItems] = useState([]);
   const [studentItems, setStudentItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +43,7 @@ const Marketplace = () => {
                   image: p.image || shop.shopImage,
                   status: shop.status,
                   type: "vendor",
+                  fullShopData: shop, // Store full object for navigation
                 });
               });
             }
@@ -54,7 +57,13 @@ const Marketplace = () => {
       onValue(itemsRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          setStudentItems(Object.values(data).reverse());
+          const itemsArray = Object.entries(data).map(([id, item]) => ({
+            id,
+            ...item,
+          }));
+          setStudentItems(itemsArray.reverse());
+        } else {
+          setStudentItems([]);
         }
       });
 
@@ -77,17 +86,33 @@ const Marketplace = () => {
     );
   });
 
+  // Check ownership for delete
+  const isOwner =
+    selectedItem &&
+    studentData &&
+    selectedItem.sellerEmail === studentData.email;
+
+  const handleDeleteItem = async () => {
+    if (!selectedItem || !isOwner) return;
+    if (!window.confirm("Delete this listing?")) return;
+
+    try {
+      await remove(ref(db, `marketplace_items/${selectedItem.id}`));
+      setSelectedItem(null);
+    } catch (error) {
+      alert("Failed to delete listing.");
+    }
+  };
+
   return (
     <div className="student-page">
       <Navbar userData={studentData} />
 
       <div className="main-content">
-        {/* HEADER & TOGGLE */}
         <div className="marketplace-header">
           <h1>Campus Marketplace</h1>
           <p>Buy from shops or trade with peers.</p>
 
-          {/* Modern Segmented Toggle */}
           <div className="toggle-pill-container">
             <button
               className={`toggle-pill-btn ${
@@ -107,15 +132,14 @@ const Marketplace = () => {
             </button>
           </div>
 
-          {/* Search Bar */}
           <div className="search-wrapper">
             <div className="search-bar-container">
               <input
                 type="text"
                 placeholder={
                   activeTab === "vendor"
-                    ? "Search pizzas, stationery..."
-                    : "Search used books, cycles..."
+                    ? "Search pizzas..."
+                    : "Search used books..."
                 }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -125,7 +149,6 @@ const Marketplace = () => {
           </div>
         </div>
 
-        {/* SELL CTA (Student Tab Only) */}
         {activeTab === "student" && (
           <div
             className="floating-sell-btn"
@@ -135,7 +158,6 @@ const Marketplace = () => {
           </div>
         )}
 
-        {/* LOADING & GRID */}
         {loading ? (
           <p className="loading-text">Loading marketplace...</p>
         ) : (
@@ -147,21 +169,26 @@ const Marketplace = () => {
                   className="marketplace-card"
                   onClick={() => {
                     if (activeTab === "vendor") {
+                      // UPDATED: Pass 'from' and 'defaultTab'
                       navigate("/shop-details", {
-                        state: { shop: { shopId: item.shopId }, studentData },
+                        state: {
+                          shop: item.fullShopData || { shopId: item.shopId },
+                          studentData,
+                          from: "/marketplace",
+                          defaultTab: "vendor",
+                        },
                       });
                     } else {
                       setSelectedItem(item);
                     }
                   }}
                 >
-                  {/* Image Area */}
                   <div className="marketplace-image-box">
                     <img
                       src={
                         item.image ||
                         item.shopImage ||
-                        "https://via.placeholder.com/300x200?text=Item"
+                        "https://via.placeholder.com/300x200"
                       }
                       alt={item.name || item.title}
                     />
@@ -174,7 +201,6 @@ const Marketplace = () => {
                     >
                       {activeTab === "vendor" ? item.shopName : "Student Ad"}
                     </span>
-
                     {activeTab === "vendor" && (
                       <span
                         className={`status-pill-small ${
@@ -186,13 +212,11 @@ const Marketplace = () => {
                     )}
                   </div>
 
-                  {/* Content Area */}
                   <div className="marketplace-info">
                     <div className="info-top">
                       <h3>{item.name || item.title}</h3>
                       <span className="price-tag">₹{item.price}</span>
                     </div>
-
                     <div className="info-bottom">
                       {activeTab === "vendor" ? (
                         <span className="link-text">Visit Shop →</span>
@@ -208,14 +232,12 @@ const Marketplace = () => {
             ) : (
               <div className="no-results">
                 <h3>🔍 No items found</h3>
-                <p>Try checking the other tab or search for something else.</p>
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* ITEM DETAILS MODAL (For Student Items) */}
       {selectedItem && (
         <div
           className="reviews-modal-overlay"
@@ -234,7 +256,6 @@ const Marketplace = () => {
                 ×
               </button>
             </div>
-
             <div className="item-modal-body">
               <img
                 src={
@@ -250,27 +271,43 @@ const Marketplace = () => {
               <span className="modal-category-pill">
                 {selectedItem.category}
               </span>
-
               <div className="modal-description-box">
                 <h4>Description</h4>
                 <p>{selectedItem.description || "No description provided."}</p>
               </div>
-
               <div className="modal-contact-box">
-                <div>
-                  <h4>Seller</h4>
-                  <p>{selectedItem.sellerName}</p>
-                </div>
-                <button
-                  className="btn-primary"
-                  onClick={() =>
-                    alert(
-                      `Contact Details:\n\nEmail: ${selectedItem.sellerEmail}\nPhone/Info: ${selectedItem.contact}`
-                    )
-                  }
-                >
-                  Contact Seller
-                </button>
+                {isOwner ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      alignItems: "center",
+                    }}
+                  >
+                    <p>Your Listing</p>
+                    <button
+                      className="btn-primary"
+                      style={{ background: "#ef4444" }}
+                      onClick={handleDeleteItem}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <h4>Seller</h4>
+                      <p>{selectedItem.sellerName}</p>
+                    </div>
+                    <button
+                      className="btn-primary"
+                      onClick={() => alert(`Contact: ${selectedItem.contact}`)}
+                    >
+                      Contact
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
