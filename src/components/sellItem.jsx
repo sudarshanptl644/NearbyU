@@ -52,20 +52,25 @@ const SellItem = () => {
     }
 
     try {
+      // Generate a new unique key for the item
       const itemsRef = ref(db, "marketplace_items");
       const newItemRef = push(itemsRef);
 
+      // Save data to that key
       await set(newItemRef, {
-        id: newItemRef.key,
+        id: newItemRef.key, // Crucial: Save the key inside the object too
         ...formData,
         image: imageBase64,
         sellerName: studentData.name || studentData.username,
-        sellerEmail: studentData.email,
+        sellerEmail: studentData.email, // Crucial: Used to verify owner for deletion
         timestamp: new Date().toISOString(),
       });
 
       alert("Item listed successfully!");
-      navigate("/marketplace", { state: { studentData } });
+      // Redirect back to marketplace (Student tab)
+      navigate("/marketplace", {
+        state: { studentData, defaultTab: "student" },
+      });
     } catch (error) {
       console.error("Error listing item:", error);
       alert("Failed to list item.");
@@ -81,7 +86,14 @@ const SellItem = () => {
       <Navbar userData={studentData} />
 
       <div className="main-content">
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button
+          className="back-btn"
+          onClick={() =>
+            navigate("/marketplace", {
+              state: { studentData, defaultTab: "student" },
+            })
+          }
+        >
           ← Back
         </button>
 
@@ -113,8 +125,6 @@ const SellItem = () => {
             </p>
 
             <form onSubmit={handleSubmit} className="review-form">
-              {" "}
-              {/* Reusing form styles */}
               {/* Image Upload */}
               <div
                 className="modern-shop-image-container"
@@ -154,6 +164,7 @@ const SellItem = () => {
                   }}
                 />
               </div>
+
               <div style={{ display: "flex", gap: "15px" }}>
                 <div style={{ flex: 1 }}>
                   <label className="input-label">Item Title</label>
@@ -162,7 +173,7 @@ const SellItem = () => {
                     placeholder="e.g. Engineering Graphics Kit"
                     value={formData.title}
                     onChange={handleChange}
-                    className="profile-input" // Reusing input styles
+                    className="profile-input"
                     required
                   />
                 </div>
@@ -179,6 +190,7 @@ const SellItem = () => {
                   />
                 </div>
               </div>
+
               <div>
                 <label className="input-label">Category</label>
                 <select
@@ -195,6 +207,7 @@ const SellItem = () => {
                   <option>Others</option>
                 </select>
               </div>
+
               <div>
                 <label className="input-label">Description</label>
                 <textarea
@@ -205,6 +218,7 @@ const SellItem = () => {
                   rows="3"
                 ></textarea>
               </div>
+
               <div>
                 <label className="input-label">
                   Contact Info (Phone/Email)
@@ -218,6 +232,7 @@ const SellItem = () => {
                   required
                 />
               </div>
+
               <button
                 type="submit"
                 className="btn-primary"
