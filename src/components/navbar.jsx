@@ -54,7 +54,6 @@ const Navbar = ({ userData }) => {
           Home
         </span>
 
-        {/* Marketplace Link */}
         <span
           onClick={() =>
             navigate("/marketplace", { state: { studentData: userData } })
@@ -63,7 +62,14 @@ const Navbar = ({ userData }) => {
           Marketplace
         </span>
 
-        <span>Favorites</span>
+        {/* UPDATED LINK */}
+        <span
+          onClick={() =>
+            navigate("/favorites", { state: { studentData: userData } })
+          }
+        >
+          Favorites
+        </span>
 
         <span
           onClick={() => navigate("/profile", { state: { userData } })}
