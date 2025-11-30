@@ -19,7 +19,7 @@
   background-position: center;
   background-repeat: no-repeat;
   font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  overflow: hidden; /* Prevent body scroll if content fits */
+  overflow: hidden;
 }
 
 /* =========================== */
@@ -27,7 +27,7 @@
 /* =========================== */
 .login-card {
   width: 420px;
-  padding: 30px; /* Reduced padding */
+  padding: 30px;
   background: white;
   border-radius: 20px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
@@ -36,12 +36,13 @@
   transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
   overflow: hidden;
-  max-height: 95vh; /* Ensure it fits in viewport */
+  max-height: 95vh;
+  overflow-y: auto;
 }
 
 /* Wide Card for Vendor View (Split Layout) */
 .login-card.wide-card {
-  width: 850px; /* Slightly narrower to fit better */
+  width: 850px;
   max-width: 95vw;
 }
 
@@ -49,20 +50,20 @@
 /* HEADER & LOGO              */
 /* =========================== */
 .login-logo-container {
-  margin-bottom: 15px; /* Reduced */
+  margin-bottom: 15px;
   display: flex;
   justify-content: center;
 }
 
 .login-logo-img {
-  height: 50px; /* Smaller logo */
+  height: 50px;
   width: auto;
   object-fit: contain;
 }
 
 .sub-header {
   color: #64748b;
-  margin-bottom: 20px; /* Reduced */
+  margin-bottom: 20px;
   font-size: 0.95rem;
   font-weight: 500;
 }
@@ -75,13 +76,13 @@
   background: #f1f5f9;
   border-radius: 12px;
   padding: 4px;
-  margin-bottom: 25px; /* Reduced */
+  margin-bottom: 25px;
   width: 100%;
 }
 
 .tab {
   flex: 1;
-  padding: 8px; /* Compact tabs */
+  padding: 8px;
   border: none;
   background: transparent;
   color: #64748b;
@@ -108,10 +109,10 @@
 /* =========================== */
 .vendor-split-layout {
   display: flex;
-  gap: 30px; /* Reduced gap */
+  gap: 30px;
   text-align: left;
   animation: slideIn 0.4s ease-out;
-  align-items: stretch; /* Ensure equal height */
+  align-items: stretch;
 }
 
 @keyframes slideIn {
@@ -128,7 +129,7 @@
 .vendor-login-side {
   flex: 1.2;
   border-right: 1px solid #e2e8f0;
-  padding-right: 30px; /* Reduced padding */
+  padding-right: 30px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -149,11 +150,11 @@
   justify-content: center;
 }
 
-/* Subscription Card - Super Compact */
+/* Subscription Card */
 .direct-plan-card {
   background: linear-gradient(135deg, #1e293b, #0f172a);
   border-radius: 16px;
-  padding: 20px; /* Tighter padding */
+  padding: 20px;
   text-align: center;
   width: 100%;
   color: white;
@@ -211,7 +212,7 @@
 }
 
 .direct-features li {
-  margin-bottom: 4px; /* Tighter list items */
+  margin-bottom: 4px;
   font-size: 0.85rem;
   color: #e2e8f0;
 }
@@ -222,7 +223,7 @@
   border: none;
   width: 100%;
   font-weight: 800;
-  padding: 10px; /* Smaller button */
+  padding: 10px;
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -242,7 +243,7 @@
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Reduced gap between inputs */
+  gap: 12px;
   width: 100%;
 }
 
@@ -254,7 +255,7 @@
 
 .input-label {
   display: block;
-  margin-bottom: 4px; /* Closer label */
+  margin-bottom: 4px;
   font-size: 0.8rem;
   font-weight: 600;
   color: #475569;
@@ -267,7 +268,7 @@
 
 .login-input {
   width: 100%;
-  padding: 10px 12px; /* Compact input padding */
+  padding: 10px 12px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -304,7 +305,7 @@
 /* =========================== */
 .btn-primary {
   width: 100%;
-  padding: 12px; /* Compact button */
+  padding: 12px;
   background: #2563eb;
   color: white;
   border: none;
@@ -356,7 +357,7 @@
 
   .vendor-login-side {
     border-right: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #e2e8f0;
     padding-right: 0;
     padding-bottom: 25px;
   }
