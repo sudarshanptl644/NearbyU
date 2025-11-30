@@ -14,6 +14,7 @@ import PaymentSelection from "./components/PaymentSelection"; // NEW
 import EditShop from "./components/EditShop"; // NEW
 import Marketplace from "./components/marketPlace";
 import SellItem from "./components/sellItem"; // NEW
+import FavoritesPage from "./components/favorites"; // NEW IMPORT
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/student-home" element={<StudentHome />} />
       <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/sell-item" element={<SellItem />} /> {/* NEW ROUTE */}
+      <Route path="/favorites" element={<FavoritesPage />} /> {/* NEW ROUTE */}
       <Route path="/shop-details" element={<VendorDetails />} />
       <Route path="/category/:categoryName" element={<CategoryPage />} />
       <Route path="/profile" element={<Profile />} />
