@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { db } from "../firebase";
-import { ref, onValue } from "firebase/database";
+import {
+  ref,
+  onValue,
+  get,
+  query,
+  orderByChild,
+  equalTo,
+  update,
+  remove,
+} from "firebase/database";
 import Navbar from "./navbar";
 import "../CSS/student.css";
 import "../CSS/darkMode.css";
@@ -10,12 +19,17 @@ const StudentHome = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const studentData = location.state?.studentData;
+  const studentData =
+    location.state?.studentData ||
+    JSON.parse(localStorage.getItem("userSession"));
 
   const [allShops, setAllShops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+
+  const [favorites, setFavorites] = useState({});
+  const [studentDbKey, setStudentDbKey] = useState(null);
 
   const CATEGORIES = ["Food", "Stationery", "Services", "Retail"];
 
@@ -26,7 +40,7 @@ const StudentHome = () => {
     }
 
     const shopsRef = ref(db, "shops");
-    const unsubscribe = onValue(shopsRef, (snapshot) => {
+    const unsubscribeShops = onValue(shopsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         setAllShops(Object.values(data));
@@ -35,7 +49,28 @@ const StudentHome = () => {
       }
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    const studentsRef = ref(db, "students");
+    const q = query(
+      studentsRef,
+      orderByChild("email"),
+      equalTo(studentData.email)
+    );
+
+    get(q).then((snapshot) => {
+      if (snapshot.exists()) {
+        const val = snapshot.val();
+        const key = Object.keys(val)[0];
+        setStudentDbKey(key);
+
+        const favRef = ref(db, `students/${key}/favorites`);
+        onValue(favRef, (favSnap) => {
+          setFavorites(favSnap.val() || {});
+        });
+      }
+    });
+
+    return () => unsubscribeShops();
   }, [studentData, navigate]);
 
   const handleSearchChange = (e) => {
@@ -56,52 +91,87 @@ const StudentHome = () => {
     setSuggestions([]);
   };
 
-  const ShopCard = ({ shop }) => (
-    <div
-      className="student-shop-card"
-      onClick={() =>
-        navigate("/shop-details", { state: { shop, studentData } })
-      }
-    >
-      <img
-        src={
-          shop.shopImage || "https://via.placeholder.com/300x200?text=No+Image"
+  const toggleFavorite = async (e, shopId) => {
+    e.stopPropagation();
+    if (!studentDbKey) return;
+
+    const favRef = ref(db, `students/${studentDbKey}/favorites/${shopId}`);
+
+    if (favorites[shopId]) {
+      await remove(favRef);
+    } else {
+      await update(ref(db, `students/${studentDbKey}/favorites`), {
+        [shopId]: true,
+      });
+    }
+  };
+
+  const ShopCard = ({ shop }) => {
+    const isLiked = !!favorites[shop.shopId];
+
+    return (
+      <div
+        className="student-shop-card relative"
+        onClick={() =>
+          navigate("/shop-details", {
+            // FIX: Pass 'from' here
+            state: { shop, studentData, from: "/student-home" },
+          })
         }
-        alt={shop.shopName}
-        className="shop-card-img"
-      />
-      <div className="shop-card-info">
-        <div className="shop-header-row">
-          <h3>{shop.shopName}</h3>
-          <span className="shop-badge">{shop.category}</span>
-        </div>
-
-        <div style={{ marginBottom: "8px" }}>
-          <span
-            className={`status-pill ${
-              shop.status === "Closed" ? "status-closed" : "status-open"
-            }`}
-            style={{ fontSize: "0.75rem" }}
-          >
-            {shop.status === "Closed" ? "🔴 Closed" : "🟢 Open"}
-          </span>
-        </div>
-
-        <p className="shop-owner">Owner: {shop.ownerName}</p>
-
-        <p
-          style={{
-            fontSize: "0.8rem",
-            color: "#999",
-            marginTop: "10px",
-            fontStyle: "italic",
-          }}
+      >
+        <button
+          className="heart-btn"
+          onClick={(e) => toggleFavorite(e, shop.shopId)}
+          title={isLiked ? "Remove from Favorites" : "Add to Favorites"}
         >
-          Click card to view full details...
-        </p>
+          <span className={`heart-icon ${isLiked ? "liked" : ""}`}>
+            {isLiked ? "❤️" : "🤍"}
+          </span>
+        </button>
+
+        <img
+          src={
+            shop.shopImage ||
+            "https://via.placeholder.com/300x200?text=No+Image"
+          }
+          alt={shop.shopName}
+          className="shop-card-img"
+        />
+        <div className="shop-card-info">
+          <div className="shop-header-row">
+            <h3>{shop.shopName}</h3>
+            <span className="shop-badge">{shop.category}</span>
+          </div>
+
+          <div style={{ marginBottom: "8px" }}>
+            <span
+              className={`status-pill ${
+                shop.status === "Closed" ? "status-closed" : "status-open"
+              }`}
+              style={{ fontSize: "0.75rem" }}
+            >
+              {shop.status === "Closed" ? "🔴 Closed" : "🟢 Open"}
+            </span>
+          </div>
+
+          <p className="shop-owner">Owner: {shop.ownerName}</p>
+
+          <p
+            style={{
+              fontSize: "0.8rem",
+              color: "#999",
+              marginTop: "10px",
+              fontStyle: "italic",
+            }}
+          >
+            Click card to view full details...
+          </p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  if (!studentData) return null;
 
   return (
     <div className="student-page">
@@ -170,7 +240,6 @@ const StudentHome = () => {
                       <div className="section-header">
                         <h2>{category}</h2>
                         {shopsInCat.length > 4 && (
-                          // FIX: Passed studentData in state here
                           <span
                             className="see-more-link"
                             onClick={() =>
