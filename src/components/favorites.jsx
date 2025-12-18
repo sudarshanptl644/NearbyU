@@ -31,6 +31,7 @@ const FavoritesPage = () => {
     }
 
     const fetchFavorites = async () => {
+      // 1. Get User Key
       const studentsRef = ref(db, "students");
       const q = query(
         studentsRef,
@@ -53,6 +54,7 @@ const FavoritesPage = () => {
           return;
         }
 
+        // 2. Get All Shops and Filter
         const shopsRef = ref(db, "shops");
         onValue(shopsRef, (shopSnap) => {
           const allShops = shopSnap.val();
@@ -76,6 +78,7 @@ const FavoritesPage = () => {
     e.stopPropagation();
     if (!studentDbKey) return;
     await remove(ref(db, `students/${studentDbKey}/favorites/${shopId}`));
+    // List updates automatically via onValue, but we can also filter locally for instant feel
     setFavoriteShops((prev) => prev.filter((s) => s.shopId !== shopId));
   };
 
@@ -110,7 +113,6 @@ const FavoritesPage = () => {
                     className="student-shop-card relative"
                     onClick={() =>
                       navigate("/shop-details", {
-                        // FIX: Pass 'from' path here
                         state: { shop, studentData, from: "/favorites" },
                       })
                     }
