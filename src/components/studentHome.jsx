@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { db } from "../firebase";
+// Realtime Database Imports
 import {
   ref,
   onValue,
+  remove,
+  set,
   get,
   query,
   orderByChild,
   equalTo,
-  update,
-  remove,
 } from "firebase/database";
 import Navbar from "./navbar";
 import "../CSS/student.css";
 import "../CSS/darkMode.css";
 
 const StudentHome = () => {
+  // ... existing state and useEffects ...
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -29,7 +31,7 @@ const StudentHome = () => {
   const [suggestions, setSuggestions] = useState([]);
 
   const [favorites, setFavorites] = useState({});
-  const [studentDbKey, setStudentDbKey] = useState(null);
+  const [userDbKey, setUserDbKey] = useState(studentData?.key || null);
 
   const CATEGORIES = ["Food", "Stationery", "Services", "Retail"];
 
@@ -50,28 +52,38 @@ const StudentHome = () => {
       setLoading(false);
     });
 
-    const studentsRef = ref(db, "students");
-    const q = query(
-      studentsRef,
-      orderByChild("email"),
-      equalTo(studentData.email)
-    );
+    const setupFavoritesListener = (key) => {
+      if (!key) return;
+      const favRef = ref(db, `students/${key}/favorites`);
+      onValue(favRef, (favSnap) => {
+        setFavorites(favSnap.val() || {});
+      });
+    };
 
-    get(q).then((snapshot) => {
-      if (snapshot.exists()) {
-        const val = snapshot.val();
-        const key = Object.keys(val)[0];
-        setStudentDbKey(key);
+    if (userDbKey) {
+      setupFavoritesListener(userDbKey);
+    } else {
+      const studentsRef = ref(db, "students");
+      const q = query(
+        studentsRef,
+        orderByChild("email"),
+        equalTo(studentData.email)
+      );
 
-        const favRef = ref(db, `students/${key}/favorites`);
-        onValue(favRef, (favSnap) => {
-          setFavorites(favSnap.val() || {});
-        });
-      }
-    });
+      get(q).then((snapshot) => {
+        if (snapshot.exists()) {
+          const val = snapshot.val();
+          const key = Object.keys(val)[0];
+          setUserDbKey(key);
+          const updatedSession = { ...studentData, key: key };
+          localStorage.setItem("userSession", JSON.stringify(updatedSession));
+          setupFavoritesListener(key);
+        }
+      });
+    }
 
     return () => unsubscribeShops();
-  }, [studentData, navigate]);
+  }, [studentData, navigate, userDbKey]);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -93,17 +105,31 @@ const StudentHome = () => {
 
   const toggleFavorite = async (e, shopId) => {
     e.stopPropagation();
-    if (!studentDbKey) return;
+    e.preventDefault();
 
-    const favRef = ref(db, `students/${studentDbKey}/favorites/${shopId}`);
+    const activeKey = userDbKey || studentData?.key;
 
-    if (favorites[shopId]) {
-      await remove(favRef);
-    } else {
-      await update(ref(db, `students/${studentDbKey}/favorites`), {
-        [shopId]: true,
-      });
+    if (!activeKey) {
+      return;
     }
+
+    const favItemRef = ref(db, `students/${activeKey}/favorites/${shopId}`);
+
+    try {
+      if (favorites[shopId]) {
+        await remove(favItemRef);
+      } else {
+        await set(favItemRef, true);
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+  };
+
+  const handleCardClick = (shop) => {
+    navigate("/shop-details", {
+      state: { shop, studentData, from: "/student-home" },
+    });
   };
 
   const ShopCard = ({ shop }) => {
@@ -112,31 +138,32 @@ const StudentHome = () => {
     return (
       <div
         className="student-shop-card relative"
-        onClick={() =>
-          navigate("/shop-details", {
-            // FIX: Pass 'from' here
-            state: { shop, studentData, from: "/student-home" },
-          })
-        }
+        onClick={() => handleCardClick(shop)}
       >
         <button
           className="heart-btn"
           onClick={(e) => toggleFavorite(e, shop.shopId)}
           title={isLiked ? "Remove from Favorites" : "Add to Favorites"}
+          style={{ zIndex: 50 }}
         >
           <span className={`heart-icon ${isLiked ? "liked" : ""}`}>
             {isLiked ? "❤️" : "🤍"}
           </span>
         </button>
 
+        {/* UPDATED: Image with Error Handling */}
         <img
           src={
-            shop.shopImage ||
-            "https://via.placeholder.com/300x200?text=No+Image"
+            shop.shopImage || "https://via.placeholder.com/300x200?text=Shop"
           }
           alt={shop.shopName}
           className="shop-card-img"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "https://via.placeholder.com/300x200?text=No+Image";
+          }}
         />
+
         <div className="shop-card-info">
           <div className="shop-header-row">
             <h3>{shop.shopName}</h3>

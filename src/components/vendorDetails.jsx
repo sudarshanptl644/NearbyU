@@ -13,22 +13,47 @@ const VendorDetails = () => {
   const shop = location.state?.shop;
   const currentUser = location.state?.studentData;
 
-  // FIX: Dynamic Back Path
   const backPath = location.state?.from || "/student-home";
   const previousTab = location.state?.defaultTab;
 
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(5);
+
   const [filterType, setFilterType] = useState("All");
   const [hasReviewed, setHasReviewed] = useState(false);
   const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
+
+  // Helper: Check if date is within last 30 days
+  const isRecent = (dateString) => {
+    if (!dateString) return false;
+    const reviewDate = new Date(dateString);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return reviewDate > thirtyDaysAgo;
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // If no shop data, show error
+  // Fetch shop if missing (from ID)
+  useEffect(() => {
+    if (shop?.shopId && !shop.shopName) {
+      const fetchShop = async () => {
+        try {
+          const snapshot = await get(ref(db, `shops/${shop.shopId}`));
+          if (snapshot.exists()) {
+            setShop(snapshot.val());
+          }
+        } catch (err) {
+          console.error("Error fetching shop:", err);
+        }
+      };
+      fetchShop();
+    }
+  }, [shop]);
+
   if (!shop || (!shop.shopName && !shop.shopId)) {
     return (
       <div className="error-page">
@@ -39,39 +64,23 @@ const VendorDetails = () => {
   }
 
   useEffect(() => {
-    // Logic to fetch additional shop details if needed (omitted for brevity as it's in previous versions)
-    if (!shop.shopName && shop.shopId) {
-      // ... fetch code ...
-    }
-  }, [shop]);
-
-  // ... (Review logic same as before) ...
-
-  const handleSubmitReview = async (e) => {
-    // ... (Review submit logic same as before) ...
-  };
-
-  const isRecent = (dateString) => {
-    const reviewDate = new Date(dateString);
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    return reviewDate > thirtyDaysAgo;
-  };
-
-  // Load reviews
-  useEffect(() => {
     if (!shop.shopId) return;
+
     const reviewsRef = ref(db, `reviews/${shop.shopId}`);
-    onValue(reviewsRef, (snapshot) => {
+    const unsubscribe = onValue(reviewsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const allReviews = Object.values(data);
-        const recent = allReviews.filter((r) =>
+
+        // FILTER: Only show reviews from the last 30 days
+        const recentReviews = allReviews.filter((r) =>
           isRecent(r.timestamp || r.date)
         );
-        setReviews(recent.reverse());
+
+        setReviews(recentReviews.reverse());
+
         if (currentUser && !currentUser.isVendor) {
-          const userReview = recent.find(
+          const userReview = recentReviews.find(
             (r) => r.studentEmail === currentUser.email
           );
           setHasReviewed(!!userReview);
@@ -81,8 +90,52 @@ const VendorDetails = () => {
         setHasReviewed(false);
       }
     });
+    return () => unsubscribe();
   }, [shop.shopId, currentUser]);
 
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+
+    if (hasReviewed) {
+      alert("You have already reviewed this shop this month.");
+      return;
+    }
+
+    if (!newReview.trim()) return;
+
+    try {
+      const now = new Date();
+      const safeName = currentUser.name
+        .replace(/\s+/g, "_")
+        .replace(/[.#$/[\]]/g, "");
+      const timeNumber = now.getTime();
+      const customKey = `${safeName}_${timeNumber}`;
+
+      const specificReviewRef = ref(db, `reviews/${shop.shopId}/${customKey}`);
+
+      await set(specificReviewRef, {
+        reviewId: customKey,
+        studentName: currentUser.name,
+        studentEmail: currentUser.email,
+        text: newReview,
+        rating: rating,
+        date: now.toLocaleDateString(),
+        time: now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        timestamp: now.toISOString(),
+      });
+
+      setNewReview("");
+      alert("Review submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting review", error);
+      alert(`Failed to post review: ${error.message}`);
+    }
+  };
+
+  // 1. Filter based on selection
   const filteredReviews = reviews.filter((review) => {
     if (filterType === "All") return true;
     if (filterType === "Positive") return review.rating >= 4;
@@ -91,10 +144,30 @@ const VendorDetails = () => {
     return true;
   });
 
+  // 2. UPDATED: Truncate list to 5 items regardless of filter type
   const displayedReviews =
-    filterType === "All" && filteredReviews.length > 5
-      ? filteredReviews.slice(0, 5)
-      : filteredReviews;
+    filteredReviews.length > 5 ? filteredReviews.slice(0, 5) : filteredReviews;
+
+  const StarDisplay = ({ count }) => (
+    <div className="star-display">
+      {[...Array(5)].map((_, i) => (
+        <span key={i} className={i < count ? "star filled" : "star empty"}>
+          ★
+        </span>
+      ))}
+    </div>
+  );
+
+  const getInitials = (name) => {
+    return name
+      ? name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .substring(0, 2)
+          .toUpperCase()
+      : "U";
+  };
 
   return (
     <div className="student-page">
@@ -104,7 +177,6 @@ const VendorDetails = () => {
         <button
           className="back-btn"
           onClick={() =>
-            // FIX: Navigate back to dynamic path with state
             navigate(backPath, {
               state: {
                 studentData: currentUser,
@@ -116,7 +188,6 @@ const VendorDetails = () => {
           ← Back
         </button>
 
-        {/* ... (Rest of UI for Header, Info, Menu, Reviews same as before) ... */}
         <div className="details-header">
           <img
             src={
@@ -159,16 +230,21 @@ const VendorDetails = () => {
                   <strong>Services</strong>
                   <p>{shop.services || "N/A"}</p>
                 </div>
+                <div className="meta-item" style={{ gridColumn: "span 2" }}>
+                  <strong>Location</strong>
+                  <p>{shop.address || "On Campus"}</p>
+                </div>
               </div>
             </div>
+
             <div className="menu-section details-info-card">
               <h3>📜 Menu / Products</h3>
               {shop.products && shop.products.length > 0 ? (
                 <div className="menu-grid">
-                  {shop.products.map((item, index) => (
-                    <div key={index} className="menu-item">
-                      <span className="item-name">{item.name}</span>
-                      <span className="item-price">₹{item.price}</span>
+                  {shop.products.map((p, i) => (
+                    <div key={i} className="menu-item">
+                      <span className="item-name">{p.name}</span>
+                      <span className="item-price">₹{p.price}</span>
                     </div>
                   ))}
                 </div>
@@ -179,14 +255,13 @@ const VendorDetails = () => {
           </div>
 
           <div className="right-col">
-            {/* ... (Reviews Section Code same as before) ... */}
             <div className="reviews-section details-info-card">
-              <h2>Monthly Reviews ({reviews.length})</h2>
-              {/* ... Filters ... */}
-              <div
-                className="review-filters"
-                style={{ display: "flex", gap: "8px", marginBottom: "20px" }}
-              >
+              <div className="reviews-header-row">
+                <h2 style={{ margin: 0 }}>Recent Reviews ({reviews.length})</h2>
+                <span className="review-cycle-badge">Monthly Cycle</span>
+              </div>
+
+              <div className="review-filters">
                 {["All", "Positive", "Neutral", "Negative"].map((type) => (
                   <button
                     key={type}
@@ -200,28 +275,89 @@ const VendorDetails = () => {
                 ))}
               </div>
 
-              {/* ... Review Form or Login Prompt ... */}
-              {/* ... Review List ... */}
-              <div className="reviews-list">
-                {displayedReviews.map((rev, i) => (
-                  <div key={i} className="review-card">
-                    <div className="review-header">
-                      <strong>{rev.studentName}</strong>
-                      <span className="review-date">{rev.date}</span>
+              {currentUser && !currentUser.isVendor ? (
+                !hasReviewed ? (
+                  <form
+                    onSubmit={handleSubmitReview}
+                    className="review-form modern-form"
+                  >
+                    <h4 className="form-title">Rate your experience</h4>
+                    <div className="star-input-container">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span
+                          key={star}
+                          className={`star-input ${
+                            star <= rating ? "filled" : ""
+                          }`}
+                          onClick={() => setRating(star)}
+                        >
+                          ★
+                        </span>
+                      ))}
                     </div>
-                    <div className="review-stars">
-                      {"⭐".repeat(rev.rating)}
+                    <textarea
+                      value={newReview}
+                      onChange={(e) => setNewReview(e.target.value)}
+                      required
+                      placeholder="Share your experience with others..."
+                      className="modern-textarea"
+                    />
+                    <button className="btn-primary full-width">
+                      Post Review
+                    </button>
+                  </form>
+                ) : (
+                  <div className="login-prompt success-prompt">
+                    <span className="prompt-icon">✅</span>
+                    <div>
+                      <strong>Thanks for reviewing!</strong>
+                      <p>
+                        You are now eligible for a loyalty coin from this
+                        vendor.
+                      </p>
                     </div>
-                    <p className="review-text">{rev.text}</p>
                   </div>
-                ))}
+                )
+              ) : (
+                <div className="login-prompt">
+                  {currentUser?.isVendor
+                    ? "🚫 Vendors cannot submit reviews."
+                    : "🔒 Login to write a review."}
+                </div>
+              )}
+
+              <div className="reviews-list">
+                {displayedReviews.length > 0 ? (
+                  displayedReviews.map((r, i) => (
+                    <div key={i} className="review-card modern-review">
+                      <div className="review-avatar">
+                        {getInitials(r.studentName)}
+                      </div>
+                      <div className="review-content">
+                        <div className="review-top">
+                          <strong>{r.studentName}</strong>
+                          <span className="review-date">{r.date}</span>
+                        </div>
+                        <StarDisplay count={r.rating} />
+                        <p className="review-text">{r.text}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="empty-reviews">
+                    <p>No reviews found for this filter.</p>
+                  </div>
+                )}
               </div>
-              {filterType === "All" && filteredReviews.length > 5 && (
+
+              {/* UPDATED: Show button for ANY filter if list > 5 */}
+              {filteredReviews.length > 5 && (
                 <button
                   className="see-more-reviews-btn"
                   onClick={() => setShowAllReviewsModal(true)}
                 >
-                  See All Reviews
+                  See All {filteredReviews.length}{" "}
+                  {filterType === "All" ? "" : filterType} Reviews
                 </button>
               )}
             </div>
@@ -229,7 +365,6 @@ const VendorDetails = () => {
         </div>
       </div>
 
-      {/* Modal Code */}
       {showAllReviewsModal && (
         <div
           className="reviews-modal-overlay"
@@ -239,18 +374,33 @@ const VendorDetails = () => {
             className="reviews-modal-content"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* ... Modal Content ... */}
-            <button
-              className="close-modal-btn"
-              onClick={() => setShowAllReviewsModal(false)}
-            >
-              ×
-            </button>
+            <div className="modal-header">
+              {/* UPDATED: Modal Title reflects filter */}
+              <h2>
+                {filterType === "All" ? "All" : filterType} Reviews (
+                {filteredReviews.length})
+              </h2>
+              <button
+                className="close-modal-btn"
+                onClick={() => setShowAllReviewsModal(false)}
+              >
+                ×
+              </button>
+            </div>
             <div className="reviews-list">
-              {filteredReviews.map((rev, i) => (
-                <div key={i} className="review-card">
-                  <strong>{rev.studentName}</strong>
-                  <p>{rev.text}</p>
+              {filteredReviews.map((r, i) => (
+                <div key={i} className="review-card modern-review">
+                  <div className="review-avatar">
+                    {getInitials(r.studentName)}
+                  </div>
+                  <div className="review-content">
+                    <div className="review-top">
+                      <strong>{r.studentName}</strong>
+                      <span className="review-date">{r.date}</span>
+                    </div>
+                    <StarDisplay count={r.rating} />
+                    <p className="review-text">{r.text}</p>
+                  </div>
                 </div>
               ))}
             </div>

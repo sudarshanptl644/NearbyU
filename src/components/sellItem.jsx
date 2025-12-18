@@ -52,25 +52,20 @@ const SellItem = () => {
     }
 
     try {
-      // Generate a new unique key for the item
       const itemsRef = ref(db, "marketplace_items");
       const newItemRef = push(itemsRef);
 
-      // Save data to that key
       await set(newItemRef, {
-        id: newItemRef.key, // Crucial: Save the key inside the object too
+        id: newItemRef.key,
         ...formData,
         image: imageBase64,
         sellerName: studentData.name || studentData.username,
-        sellerEmail: studentData.email, // Crucial: Used to verify owner for deletion
+        sellerEmail: studentData.email,
         timestamp: new Date().toISOString(),
       });
 
       alert("Item listed successfully!");
-      // Redirect back to marketplace (Student tab)
-      navigate("/marketplace", {
-        state: { studentData, defaultTab: "student" },
-      });
+      navigate("/marketplace", { state: { studentData } });
     } catch (error) {
       console.error("Error listing item:", error);
       alert("Failed to list item.");
@@ -219,13 +214,13 @@ const SellItem = () => {
                 ></textarea>
               </div>
 
+              {/* UPDATED: Explicit Phone Label */}
               <div>
-                <label className="input-label">
-                  Contact Info (Phone/Email)
-                </label>
+                <label className="input-label">Contact Phone Number</label>
                 <input
                   name="contact"
-                  placeholder="How can buyers reach you?"
+                  type="tel"
+                  placeholder="e.g. 9876543210"
                   value={formData.contact}
                   onChange={handleChange}
                   className="profile-input"

@@ -18,7 +18,10 @@ const Profile = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const initialUserData = location.state?.userData;
+  // Accept 'studentData' (returned from VendorDetails) or 'userData' (from Login/Navbar)
+  const initialUserData =
+    location.state?.userData || location.state?.studentData;
+
   const [userData, setUserData] = useState(initialUserData);
   const [loading, setLoading] = useState(true);
 
@@ -27,6 +30,15 @@ const Profile = () => {
   const [rewardLoading, setRewardLoading] = useState(false);
 
   const isVendor = !!userData?.storeName || userData?.isVendor === true;
+
+  // Logic for Back Button
+  const handleBack = () => {
+    if (location.state?.from) {
+      navigate(location.state.from);
+    } else {
+      navigate(-1);
+    }
+  };
 
   useEffect(() => {
     if (!initialUserData) {
@@ -50,7 +62,12 @@ const Profile = () => {
         if (snapshot.exists()) {
           const val = snapshot.val();
           const key = Object.keys(val)[0];
-          setUserData({ ...val[key], key });
+          // Ensure walletBalance defaults to 0 if not present
+          setUserData({
+            ...val[key],
+            key,
+            walletBalance: val[key].walletBalance || 0,
+          });
         }
 
         if (isVendor) {
@@ -108,118 +125,77 @@ const Profile = () => {
     }
   };
 
+  // --- UPDATED: REDEEM LOGIC (Convert Coins to Wallet Money) ---
   const handleRedeem = async () => {
     if (userData.coins >= 10 && userData.key) {
-      await update(ref(db, `students/${userData.key}`), {
-        coins: userData.coins - 10,
-      });
-      setUserData({ ...userData, coins: userData.coins - 10 });
-      alert("🎉 Coupon Redeemed! Code: SAVE10-NEARBYU");
+      try {
+        const newCoinBalance = userData.coins - 10;
+        const newWalletBalance = (userData.walletBalance || 0) + 10;
+
+        await update(ref(db, `students/${userData.key}`), {
+          coins: newCoinBalance,
+          walletBalance: newWalletBalance,
+        });
+
+        setUserData({
+          ...userData,
+          coins: newCoinBalance,
+          walletBalance: newWalletBalance,
+        });
+        alert("🎉 ₹10 added to your Earned Money!");
+      } catch (error) {
+        console.error("Redemption error", error);
+      }
     }
   };
 
-  // Helper: Check if date is within 30 days
-  const isWithinMonth = (isoDate) => {
-    if (!isoDate) return false;
-    const date = new Date(isoDate);
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    return date > thirtyDaysAgo;
+  // --- NEW: WITHDRAW LOGIC ---
+  const handleWithdraw = async () => {
+    if ((userData.walletBalance || 0) > 0 && userData.key) {
+      if (
+        window.confirm(`Withdraw ₹${userData.walletBalance} to your account?`)
+      ) {
+        try {
+          await update(ref(db, `students/${userData.key}`), {
+            walletBalance: 0,
+          });
+          setUserData({ ...userData, walletBalance: 0 });
+          alert("We have sent you the money!");
+        } catch (error) {
+          console.error("Withdrawal error", error);
+        }
+      }
+    } else {
+      alert("No earnings to withdraw yet.");
+    }
   };
 
-  // --- STRICT COIN GIVING LOGIC ---
   const handleGiveCoin = async () => {
     if (!rewardEmail.trim()) return;
-    if (!myShop) {
-      alert("Error: Shop details not loaded.");
-      return;
-    }
-
     setRewardLoading(true);
-    const studentEmailTrimmed = rewardEmail.trim();
-
     try {
-      // 1. Verify Student Exists
       const studentsRef = ref(db, "students");
       const q = query(
         studentsRef,
         orderByChild("email"),
-        equalTo(studentEmailTrimmed)
+        equalTo(rewardEmail.trim())
       );
-      const studentSnap = await get(q);
+      const snapshot = await get(q);
+      if (snapshot.exists()) {
+        const sData = snapshot.val();
+        const sKey = Object.keys(sData)[0];
+        const currentCoins = sData[sKey].coins || 0;
 
-      if (!studentSnap.exists()) {
-        alert("Student not found. Please check the email address.");
-        setRewardLoading(false);
-        return;
+        await update(ref(db, `students/${sKey}`), { coins: currentCoins + 1 });
+
+        alert(`Sent 1 Coin to ${rewardEmail}!`);
+        setRewardEmail("");
+      } else {
+        alert("Student not found. Check the email ID.");
       }
-
-      const studentData = studentSnap.val();
-      const studentKey = Object.keys(studentData)[0];
-      const currentCoins = studentData[studentKey].coins || 0;
-
-      // 2. CHECK: Has Student Reviewed this Shop recently?
-      const reviewsRef = ref(db, `reviews/${myShop.shopId}`);
-      const reviewsSnap = await get(reviewsRef);
-
-      let hasValidReview = false;
-      if (reviewsSnap.exists()) {
-        const allReviews = Object.values(reviewsSnap.val());
-        // Find review from this email AND within last 30 days
-        const validReview = allReviews.find(
-          (r) =>
-            r.studentEmail === studentEmailTrimmed && isWithinMonth(r.timestamp)
-        );
-        if (validReview) hasValidReview = true;
-      }
-
-      if (!hasValidReview) {
-        alert(
-          `❌ REJECTED: This student has not written a review for ${myShop.shopName} in the last 30 days.`
-        );
-        setRewardLoading(false);
-        return;
-      }
-
-      // 3. CHECK: Has Vendor already given a coin this month?
-      // We use a sanitized email key to store log (replace . with ,)
-      const sanitizedEmail = studentEmailTrimmed.replace(/\./g, ",");
-      const coinLogRef = ref(
-        db,
-        `coin_logs/${myShop.shopId}/${sanitizedEmail}`
-      );
-      const coinLogSnap = await get(coinLogRef);
-
-      if (coinLogSnap.exists()) {
-        const lastCoinDate = coinLogSnap.val().lastCoinDate;
-        if (isWithinMonth(lastCoinDate)) {
-          alert(
-            "❌ REJECTED: You have already given a coin to this student this month."
-          );
-          setRewardLoading(false);
-          return;
-        }
-      }
-
-      // 4. SUCCESS: Update Coin & Log Transaction
-      const nowISO = new Date().toISOString();
-
-      // Give Coin
-      await update(ref(db, `students/${studentKey}`), {
-        coins: currentCoins + 1,
-      });
-
-      // Log Transaction
-      await set(coinLogRef, {
-        lastCoinDate: nowISO,
-        studentEmail: studentEmailTrimmed,
-      });
-
-      alert(`✅ Success! Sent 1 Coin to ${studentEmailTrimmed}.`);
-      setRewardEmail("");
     } catch (error) {
-      console.error("Reward Error:", error);
-      alert(`Failed: ${error.message}`);
+      console.error(error);
+      alert("Failed to send coin.");
     } finally {
       setRewardLoading(false);
     }
@@ -236,6 +212,7 @@ const Profile = () => {
             isVendor: true,
             originalVendorData: userData.originalVendorData || userData,
           },
+          from: "/profile",
         },
       });
     }
@@ -248,7 +225,7 @@ const Profile = () => {
       {!isVendor && <Navbar userData={userData} />}
 
       <div className="main-content">
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button className="back-btn" onClick={handleBack}>
           ← Back
         </button>
 
@@ -269,7 +246,11 @@ const Profile = () => {
                   : "U"}
               </div>
             )}
-            <label htmlFor="avatar-upload" className="avatar-upload-btn">
+            <label
+              htmlFor="avatar-upload"
+              className="avatar-upload-btn"
+              title="Upload Photo"
+            >
               📷
             </label>
             <input
@@ -280,7 +261,11 @@ const Profile = () => {
               style={{ display: "none" }}
             />
             {userData.profileImage && (
-              <button className="avatar-delete-btn" onClick={handleDeleteImage}>
+              <button
+                className="avatar-delete-btn"
+                onClick={handleDeleteImage}
+                title="Remove Photo"
+              >
                 🗑️
               </button>
             )}
@@ -376,13 +361,59 @@ const Profile = () => {
                   <span className="coin-count">{userData.coins || 0}</span>
                 </div>
                 <p>Coins Balance</p>
+
+                {/* 1. Redeem Button */}
                 <button
                   className="redeem-btn"
                   disabled={(userData.coins || 0) < 10}
                   onClick={handleRedeem}
+                  style={{ marginBottom: "20px" }}
                 >
-                  Redeem ₹10 Coupon
+                  {(userData.coins || 0) >= 10
+                    ? "Redeem ₹10"
+                    : `Need ${10 - (userData.coins || 0)} more coins`}
                 </button>
+
+                {/* 2. NEW: Earned Money Section */}
+                <div
+                  className="earned-money-box"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.5)",
+                    padding: "15px",
+                    borderRadius: "12px",
+                    width: "100%",
+                    border: "1px dashed #b45309",
+                    marginTop: "10px",
+                  }}
+                >
+                  <h4
+                    style={{
+                      margin: "0 0 5px 0",
+                      fontSize: "0.9rem",
+                      color: "#92400e",
+                    }}
+                  >
+                    Earned Money
+                  </h4>
+                  <div
+                    style={{
+                      fontSize: "2rem",
+                      fontWeight: "800",
+                      color: "#15803d",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    ₹{userData.walletBalance || 0}
+                  </div>
+                  <button
+                    className="small-btn btn-primary"
+                    style={{ background: "#15803d", border: "none" }}
+                    onClick={handleWithdraw}
+                    disabled={(userData.walletBalance || 0) <= 0}
+                  >
+                    Get earned money in Your account
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -408,19 +439,9 @@ const Profile = () => {
                     onClick={handleGiveCoin}
                     disabled={rewardLoading}
                   >
-                    {rewardLoading ? "Verifying..." : "Send Coin"}
+                    {rewardLoading ? "Sending..." : "Send Coin"}
                   </button>
                 </div>
-                <p
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "#64748b",
-                    marginTop: "10px",
-                    fontStyle: "italic",
-                  }}
-                >
-                  *Student must have reviewed you this month.
-                </p>
               </div>
             ) : (
               <div className="profile-card-wrapper coin-info-card">
@@ -434,7 +455,10 @@ const Profile = () => {
                     <br />
                     <strong>2. Earn:</strong> Get 1 Coin per visit.
                     <br />
-                    <strong>3. Redeem:</strong> 10 Coins = ₹10 Coupon!
+                    <strong>3. Redeem:</strong> 10 Coins = ₹10 Cash!
+                    <br />
+                    <strong>4. Withdraw:</strong> Transfer directly to your
+                    account.
                   </p>
                 </div>
               </div>

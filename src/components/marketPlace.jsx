@@ -8,8 +8,9 @@ import "../CSS/student.css";
 const Marketplace = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const studentData = location.state?.studentData;
-  // Retrieve tab state if returning from details page
+  const studentData =
+    location.state?.studentData ||
+    JSON.parse(localStorage.getItem("userSession"));
   const initialTab = location.state?.defaultTab || "vendor";
 
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -43,7 +44,7 @@ const Marketplace = () => {
                   image: p.image || shop.shopImage,
                   status: shop.status,
                   type: "vendor",
-                  fullShopData: shop, // Store full object for navigation
+                  shopData: shop,
                 });
               });
             }
@@ -86,7 +87,6 @@ const Marketplace = () => {
     );
   });
 
-  // Check ownership for delete
   const isOwner =
     selectedItem &&
     studentData &&
@@ -94,13 +94,18 @@ const Marketplace = () => {
 
   const handleDeleteItem = async () => {
     if (!selectedItem || !isOwner) return;
-    if (!window.confirm("Delete this listing?")) return;
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this listing?"
+    );
+    if (!confirmDelete) return;
 
     try {
       await remove(ref(db, `marketplace_items/${selectedItem.id}`));
       setSelectedItem(null);
     } catch (error) {
-      alert("Failed to delete listing.");
+      console.error("Error deleting item:", error);
+      alert("Failed to delete listing. Please try again.");
     }
   };
 
@@ -138,8 +143,8 @@ const Marketplace = () => {
                 type="text"
                 placeholder={
                   activeTab === "vendor"
-                    ? "Search pizzas..."
-                    : "Search used books..."
+                    ? "Search pizzas, stationery..."
+                    : "Search used books, cycles..."
                 }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -169,10 +174,9 @@ const Marketplace = () => {
                   className="marketplace-card"
                   onClick={() => {
                     if (activeTab === "vendor") {
-                      // UPDATED: Pass 'from' and 'defaultTab'
                       navigate("/shop-details", {
                         state: {
-                          shop: item.fullShopData || { shopId: item.shopId },
+                          shop: item.shopData || { shopId: item.shopId },
                           studentData,
                           from: "/marketplace",
                           defaultTab: "vendor",
@@ -188,7 +192,7 @@ const Marketplace = () => {
                       src={
                         item.image ||
                         item.shopImage ||
-                        "https://via.placeholder.com/300x200"
+                        "https://via.placeholder.com/300x200?text=Item"
                       }
                       alt={item.name || item.title}
                     />
@@ -201,6 +205,7 @@ const Marketplace = () => {
                     >
                       {activeTab === "vendor" ? item.shopName : "Student Ad"}
                     </span>
+
                     {activeTab === "vendor" && (
                       <span
                         className={`status-pill-small ${
@@ -217,6 +222,7 @@ const Marketplace = () => {
                       <h3>{item.name || item.title}</h3>
                       <span className="price-tag">₹{item.price}</span>
                     </div>
+
                     <div className="info-bottom">
                       {activeTab === "vendor" ? (
                         <span className="link-text">Visit Shop →</span>
@@ -232,6 +238,7 @@ const Marketplace = () => {
             ) : (
               <div className="no-results">
                 <h3>🔍 No items found</h3>
+                <p>Try checking the other tab or search for something else.</p>
               </div>
             )}
           </div>
@@ -256,6 +263,7 @@ const Marketplace = () => {
                 ×
               </button>
             </div>
+
             <div className="item-modal-body">
               <img
                 src={
@@ -271,10 +279,12 @@ const Marketplace = () => {
               <span className="modal-category-pill">
                 {selectedItem.category}
               </span>
+
               <div className="modal-description-box">
                 <h4>Description</h4>
                 <p>{selectedItem.description || "No description provided."}</p>
               </div>
+
               <div className="modal-contact-box">
                 {isOwner ? (
                   <div
@@ -285,13 +295,16 @@ const Marketplace = () => {
                       alignItems: "center",
                     }}
                   >
-                    <p>Your Listing</p>
+                    <div>
+                      <h4>Manage Listing</h4>
+                      <p>This is your item.</p>
+                    </div>
                     <button
                       className="btn-primary"
-                      style={{ background: "#ef4444" }}
+                      style={{ background: "#ef4444", border: "none" }}
                       onClick={handleDeleteItem}
                     >
-                      Delete
+                      Delete / Sold
                     </button>
                   </div>
                 ) : (
@@ -302,9 +315,14 @@ const Marketplace = () => {
                     </div>
                     <button
                       className="btn-primary"
-                      onClick={() => alert(`Contact: ${selectedItem.contact}`)}
+                      onClick={() =>
+                        // UPDATED: Only showing Phone Number now
+                        alert(
+                          `Contact Details:\n\nPhone Number: ${selectedItem.contact}`
+                        )
+                      }
                     >
-                      Contact
+                      Contact Seller
                     </button>
                   </>
                 )}
