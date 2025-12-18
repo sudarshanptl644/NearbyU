@@ -63,14 +63,16 @@ nearbyU/
 Follow these steps to run the project locally.
 
 ### 1. Clone the Repository
-Bash
+```bash
 
 git clone [https://github.com/your-username/nearbyU.git](https://github.com/your-username/nearbyU.git)
 cd nearbyU
+```
 ### 2. Install Dependencies
-Bash
+```bash
 
 npm install
+```
 ### 3. Configure Firebase
 Create a project on the Firebase Console.
 
@@ -79,9 +81,10 @@ Enable Authentication and Realtime Database.
 Add your Firebase configuration keys to src/firebase.js.
 
 ### 4. Run the Development Server
-Bash
+```bash
 
-**npm run dev**
+npm run dev
+```
 The app will start on http://localhost:5173 (or the port shown in your terminal).
 
  ## 📜 Available Scripts
