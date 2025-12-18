@@ -56,7 +56,9 @@ nearbyU/
 ├── tailwind.config.js
 └── vite.config.js
 
-⚙️ Installation & Setup
+---
+
+## ⚙️ Installation & Setup
 Follow these steps to run the project locally.
 
 1. Clone the Repository
@@ -81,7 +83,7 @@ Bash
 npm run dev
 The app will start on http://localhost:5173 (or the port shown in your terminal).
 
-📜 Available Scripts
+ ## 📜 Available Scripts
 npm run dev: Starts the development server.
 
 npm run build: Builds the app for production.
@@ -90,7 +92,7 @@ npm run lint: Runs ESLint to check for code quality.
 
 npm run preview: Preview the production build locally.
 
-📝 License
+## 📝 License
 This project is created for educational purposes as a University Mini-Project.
 
 Made with ❤️ using React & Tailwind
