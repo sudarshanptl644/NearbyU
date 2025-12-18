@@ -55,42 +55,43 @@ nearbyU/
 ├── package.json
 ├── tailwind.config.js
 └── vite.config.js
+```
 
 ---
 
 ## ⚙️ Installation & Setup
 Follow these steps to run the project locally.
 
-1. Clone the Repository
+### 1. Clone the Repository
 Bash
 
 git clone [https://github.com/your-username/nearbyU.git](https://github.com/your-username/nearbyU.git)
 cd nearbyU
-2. Install Dependencies
+### 2. Install Dependencies
 Bash
 
 npm install
-3. Configure Firebase
+### 3. Configure Firebase
 Create a project on the Firebase Console.
 
 Enable Authentication and Realtime Database.
 
 Add your Firebase configuration keys to src/firebase.js.
 
-4. Run the Development Server
+### 4. Run the Development Server
 Bash
 
-npm run dev
+**npm run dev**
 The app will start on http://localhost:5173 (or the port shown in your terminal).
 
  ## 📜 Available Scripts
-npm run dev: Starts the development server.
+**npm run dev**: Starts the development server.
 
-npm run build: Builds the app for production.
+**npm run build**: Builds the app for production.
 
-npm run lint: Runs ESLint to check for code quality.
+**npm run lint**: Runs ESLint to check for code quality.
 
-npm run preview: Preview the production build locally.
+**npm run preview**: Preview the production build locally.
 
 ## 📝 License
 This project is created for educational purposes as a University Mini-Project.
